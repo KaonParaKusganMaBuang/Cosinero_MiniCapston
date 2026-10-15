@@ -3,7 +3,7 @@ import kasinaganPoster from './assets/1.jpeg'
 const photo = (id) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1000&q=80`
 
-export const events = [
+export const defaultEvents = [
   {
     id: 1,
     title: 'Summer Music Festival',
@@ -65,3 +65,73 @@ export const events = [
       'Humanda sa isang gabing puno ng musika, saya, at mga performances mula sa mga paborito ninyong artist! Sama-sama nating abangan sa entablado sina FLOW G, SKUSTA CLEE, GLOC-9, SUNKISSED LOLA, ASHLEY ORTEGA, ANTHONY CONSTANTINO, at MARKO RUDIO.',
   },
 ]
+
+const CUSTOM_EVENTS_KEY = 'customEvents'
+const HIDDEN_EVENT_IDS_KEY = 'hiddenEventIds'
+
+export function getCustomEvents() {
+  if (typeof window === 'undefined') return []
+
+  try {
+    const value = JSON.parse(localStorage.getItem(CUSTOM_EVENTS_KEY) || '[]')
+    return Array.isArray(value) ? value : []
+  } catch {
+    return []
+  }
+}
+
+export function getHiddenEventIds() {
+  if (typeof window === 'undefined') return []
+
+  try {
+    const value = JSON.parse(localStorage.getItem(HIDDEN_EVENT_IDS_KEY) || '[]')
+    return Array.isArray(value) ? value.map(Number) : []
+  } catch {
+    return []
+  }
+}
+
+export function getEvents() {
+  const hiddenIds = new Set(getHiddenEventIds())
+  const visibleDefault = defaultEvents.filter((event) => !hiddenIds.has(event.id))
+  return [...visibleDefault, ...getCustomEvents()]
+}
+
+export function addCustomEvent(event) {
+  const customEvents = getCustomEvents()
+  const nextId = Math.max(0, ...defaultEvents.map((item) => item.id), ...customEvents.map((item) => item.id)) + 1
+
+  const newEvent = {
+    id: Number(event.id ?? nextId),
+    title: String(event.title || 'New Event').trim() || 'New Event',
+    category: String(event.category || 'General').trim() || 'General',
+    date: String(event.date || 'TBA').trim() || 'TBA',
+    time: String(event.time || 'TBA').trim() || 'TBA',
+    location: String(event.location || 'TBA').trim() || 'TBA',
+    price: Number(event.price) || 0,
+    image:
+      event.image ||
+      'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1000&q=80',
+    description:
+      String(event.description || 'A newly added event for the community.').trim() ||
+      'A newly added event for the community.',
+  }
+
+  const updated = [...customEvents, newEvent]
+  localStorage.setItem(CUSTOM_EVENTS_KEY, JSON.stringify(updated))
+  return newEvent
+}
+
+export function removeEventById(eventId) {
+  const id = Number(eventId)
+  const customEvents = getCustomEvents().filter((event) => Number(event.id) !== id)
+  localStorage.setItem(CUSTOM_EVENTS_KEY, JSON.stringify(customEvents))
+
+  const hiddenIds = getHiddenEventIds()
+  if (defaultEvents.some((event) => event.id === id)) {
+    const next = [...new Set([...hiddenIds, id])]
+    localStorage.setItem(HIDDEN_EVENT_IDS_KEY, JSON.stringify(next))
+  }
+}
+
+export const events = getEvents()

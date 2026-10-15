@@ -3,12 +3,13 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppHeader from '../components/AppHeader.vue'
 import BottomNav from '../components/BottomNav.vue'
-import { events } from '../events'
+import { getEvents } from '../events'
 
 const route = useRoute()
 const router = useRouter()
 
-const event = computed(() => events.find((e) => e.id === Number(route.params.id)))
+const event = computed(() => getEvents().find((e) => e.id === Number(route.params.id)))
+const formatPrice = (value) => `₱${Number(value || 0).toLocaleString()}`
 </script>
 
 <template>
@@ -34,8 +35,8 @@ const event = computed(() => events.find((e) => e.id === Number(route.params.id)
         <span>LOCATION</span><strong>{{ event.location }}</strong>
       </div>
       <div>
-        <span>TICKET PRICE</span>
-        <strong>₱{{ event.price.toLocaleString() }}</strong>
+        <span>PRICE</span>
+        <strong>{{ formatPrice(event.price) }}</strong>
       </div>
     </div>
 

@@ -3,9 +3,10 @@ import { computed } from 'vue'
 import AppHeader from '../components/AppHeader.vue'
 import BottomNav from '../components/BottomNav.vue'
 import EventCard from '../components/EventCard.vue'
-import { events } from '../events'
+import { getEvents } from '../events'
 
 const user = computed(() => JSON.parse(localStorage.getItem('eventUser') || '{}'))
+const featuredEvents = computed(() => getEvents().slice(0, 3))
 </script>
 
 <template>
@@ -31,7 +32,7 @@ const user = computed(() => JSON.parse(localStorage.getItem('eventUser') || '{}'
       <p class="muted">Welcome, {{ user.name || 'Guest' }}!</p>
 
       <div class="event-grid">
-        <EventCard v-for="event in events.slice(0, 3)" :key="event.id" :event="event" />
+        <EventCard v-for="event in featuredEvents" :key="event.id" :event="event" />
       </div>
     </section>
   </main>

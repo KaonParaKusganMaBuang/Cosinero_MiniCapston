@@ -1,5 +1,12 @@
 <script setup>
-defineProps({ event: { type: Object, required: true } })
+const props = defineProps({ event: { type: Object, required: true } })
+const emit = defineEmits(['remove'])
+
+const formatPrice = (value) => `₱${Number(value || 0).toLocaleString()}`
+
+function removeEvent() {
+  emit('remove', props.event.id)
+}
 </script>
 
 <template>
@@ -11,10 +18,18 @@ defineProps({ event: { type: Object, required: true } })
       <p>📅 {{ event.date }}</p>
       <p>📍 {{ event.location }}</p>
       <div class="card-footer">
-        <strong>₱{{ event.price.toLocaleString() }}</strong>
-        <RouterLink class="btn btn-small" :to="`/events/${event.id}`">
-          View event
-        </RouterLink>
+        <div>
+          <small class="price-label">Price</small>
+          <strong>{{ formatPrice(event.price) }}</strong>
+        </div>
+        <div class="card-actions">
+          <button type="button" class="mini-action" @click.stop="removeEvent">
+            Remove
+          </button>
+          <RouterLink class="btn btn-small" :to="`/events/${event.id}`">
+            View event
+          </RouterLink>
+        </div>
       </div>
     </div>
   </article>
