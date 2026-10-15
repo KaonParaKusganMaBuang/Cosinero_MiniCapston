@@ -5,7 +5,11 @@ const emit = defineEmits(['remove'])
 const formatPrice = (value) => `₱${Number(value || 0).toLocaleString()}`
 
 function removeEvent() {
-  emit('remove', props.event.id)
+  const confirmed = window.confirm('Are you sure you want to remove this?')
+
+  if (confirmed) {
+    emit('remove', props.event.id)
+  }
 }
 </script>
 

@@ -60,7 +60,7 @@ export const defaultEvents = [
     time: '6:00 NG GABI',
     location: 'Pilar Municipal Grounds',
     price: 500,
-    image: kasinaganPoster,
+    image: kasinaganPoster, 
     description:
       'Humanda sa isang gabing puno ng musika, saya, at mga performances mula sa mga paborito ninyong artist! Sama-sama nating abangan sa entablado sina FLOW G, SKUSTA CLEE, GLOC-9, SUNKISSED LOLA, ASHLEY ORTEGA, ANTHONY CONSTANTINO, at MARKO RUDIO.',
   },

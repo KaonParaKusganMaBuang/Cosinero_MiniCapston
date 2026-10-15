@@ -1,25 +1,61 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import AppHeader from '../components/AppHeader.vue'
 import BottomNav from '../components/BottomNav.vue'
 import EventCard from '../components/EventCard.vue'
 import { addCustomEvent, getEvents, removeEventById } from '../events'
 
+const FORM_DRAFT_KEY = 'eventFormDraft'
+const SEARCH_DRAFT_KEY = 'eventSearchDraft'
+const CATEGORY_DRAFT_KEY = 'eventCategoryDraft'
+
 const search = ref('')
 const category = ref('All')
 const allEvents = ref(getEvents())
 
+const savedDraft = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem(FORM_DRAFT_KEY) || 'null') : null
+
 const newEvent = ref({
-  title: '',
-  category: 'Music',
-  date: '',
-  time: '',
-  location: '',
-  price: 0,
-  description: '',
+  title: savedDraft?.title || '',
+  category: savedDraft?.category || 'Music',
+  date: savedDraft?.date || '',
+  time: savedDraft?.time || '',
+  location: savedDraft?.location || '',
+  price: savedDraft?.price ?? 0,
+  description: savedDraft?.description || '',
 })
 
+if (typeof window !== 'undefined') {
+  const savedSearch = localStorage.getItem(SEARCH_DRAFT_KEY)
+  const savedCategory = localStorage.getItem(CATEGORY_DRAFT_KEY)
+
+  search.value = savedSearch || ''
+  category.value = savedCategory || 'All'
+}
+
 const categories = computed(() => ['All', ...new Set(allEvents.value.map((e) => e.category))])
+
+watch(
+  newEvent,
+  (value) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(FORM_DRAFT_KEY, JSON.stringify(value))
+    }
+  },
+  { deep: true },
+)
+
+watch(search, (value) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(SEARCH_DRAFT_KEY, value)
+  }
+})
+
+watch(category, (value) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(CATEGORY_DRAFT_KEY, value)
+  }
+})
 
 const filteredEvents = computed(() =>
   allEvents.value.filter((event) => {
@@ -60,6 +96,10 @@ function submitEvent() {
     location: '',
     price: 0,
     description: '',
+  }
+
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(FORM_DRAFT_KEY)
   }
 
   refreshEvents()

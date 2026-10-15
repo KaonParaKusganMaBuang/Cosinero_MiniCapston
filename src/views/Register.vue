@@ -6,6 +6,7 @@ const router = useRouter()
 const name = ref('')
 const email = ref('')
 const password = ref('')
+const confirmPassword = ref('')
 const error = ref('')
 
 function register() {
@@ -14,6 +15,11 @@ function register() {
 
   if (password.value.length < 6) {
     error.value = 'Password must contain at least 6 characters.'
+    return
+  }
+
+  if (password.value !== confirmPassword.value) {
+    error.value = 'Passwords do not match.'
     return
   }
 
@@ -60,6 +66,15 @@ function register() {
           required
           minlength="6"
           placeholder="At least 6 characters"
+        />
+
+        <label>Confirm password</label>
+        <input
+          v-model="confirmPassword"
+          type="password"
+          required
+          minlength="6"
+          placeholder="Re-enter your password"
         />
 
         <p v-if="error" class="error">{{ error }}</p>
